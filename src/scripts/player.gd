@@ -1,6 +1,13 @@
 extends CharacterBody2D
+class_name Player
 
 
+class HistoryState:
+	var pos: Vector2
+	var state: States
+
+
+const MAX_HISTORY: int = 300
 const SPEED: float = 100.0
 const JUMP: float = 150.0
 const ACCEL: float = 0.1
@@ -11,6 +18,11 @@ const HOLD_DIVISOR: float = 2.5
 const JUMP_BUFFER: int = 16
 const ENTER_WALL_VEL: float = 50.0
 const TERMINAL_VEL: float = 300.0
+const WALL_STICK_FRAMES: int = 30
+const WALL_COYOTE_FRAMES: int = 2
+const COYOTE_FRAMES: int = 1
+const WALL_JUMP_EFFECT_DECAY: float = 1.3
+const WALL_JUMP_Y_SCALE: float = 0.8
 
 
 enum States {ON_FLOOR,
@@ -30,8 +42,11 @@ var wall_jump_effect: float = 0.0:
 var last_wall_jump_dir: float = 0.0
 var wall_jump_coyote: int = 0
 var wall_normal_coyote: Vector2
+var wall_stick: int = 0
 var jump_coyote: int = 0
 var jump_released := false
+var history: Array[HistoryState] = []
+var ghosts: Array[Ghost]
 
 
 @onready var label: Label = $Label
@@ -47,13 +62,14 @@ func movement_on_floor(delta: float) -> void:
 	velocity.x = input_x * SPEED
 	
 	wall_jump_coyote = 0
+	wall_stick = 0
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
 		jump_released = false
 		jump_coyote = 0
 	else:
-		jump_coyote = 1
+		jump_coyote = COYOTE_FRAMES
 
 
 func movement_on_wall(delta: float) -> void:
@@ -61,7 +77,8 @@ func movement_on_wall(delta: float) -> void:
 	var wall_normal := get_wall_normal()
 	wall_normal_coyote = wall_normal
 	
-	velocity.x = input_x * SPEED
+	if not wall_stick:
+		velocity.x = input_x * SPEED
 	velocity.x -= wall_normal.x * 50.0
 	
 	jump_coyote = 0
@@ -81,13 +98,15 @@ func movement_on_wall(delta: float) -> void:
 		velocity += get_gravity() * delta * GRAV * WALL_FRICTION
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
-		velocity = Vector2(wall_normal.x, -1.0).normalized() * JUMP
+		var diagonal_vel := Vector2(wall_normal.x, -1.0).normalized() * JUMP
+		velocity = Vector2(diagonal_vel.x, -JUMP * WALL_JUMP_Y_SCALE)
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal.x
 		jump_released = false
 		wall_jump_coyote = 0
+		wall_stick = WALL_STICK_FRAMES
 	else:
-		wall_jump_coyote = 2
+		wall_jump_coyote = WALL_COYOTE_FRAMES
 
 
 func movement_ascending(delta: float) -> void:
@@ -139,14 +158,17 @@ func movement_floor_coyote(delta: float) -> void:
 func movement_wall_coyote(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	
-	velocity.x = input_x * SPEED
+	if not wall_stick:
+		velocity.x = input_x * SPEED
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
-		velocity = Vector2(wall_normal_coyote.x, -1.0).normalized() * JUMP
+		var diagonal_vel := Vector2(wall_normal_coyote.x, -1.0).normalized() * JUMP
+		velocity = Vector2(diagonal_vel.x, -JUMP * WALL_JUMP_Y_SCALE)
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal_coyote.x
 		jump_released = false
 		wall_jump_coyote = 0
+		wall_stick = WALL_STICK_FRAMES
 
 
 func _physics_process(delta: float) -> void:
@@ -187,10 +209,27 @@ func _physics_process(delta: float) -> void:
 		state = States.ASCENDING
 	
 	if wall_jump_effect:
-		wall_jump_effect -= delta * 1.5
+		wall_jump_effect -= delta * WALL_JUMP_EFFECT_DECAY
 	if jump_coyote:
 		jump_coyote -= 1
 	if wall_jump_coyote:
 		wall_jump_coyote -= 1
 	if jump_buffer:
 		jump_buffer -= 1
+	if wall_stick:
+		wall_stick -= 1
+	
+	var new_history_state := HistoryState.new()
+	new_history_state.pos = global_position
+	new_history_state.state = state
+	history.append(new_history_state)
+	
+	if history.size() > MAX_HISTORY:
+		history.remove_at(0)
+	elif fmod(history.size(), Ghost.INTERVAL) == 0:
+		var new_ghost := Ghost.new()
+		new_ghost.idx = ghosts.size()
+		new_ghost.player = self
+		add_child(new_ghost)
+		ghosts.append(new_ghost)
+		print("new_ghost: %s" % new_ghost.idx)

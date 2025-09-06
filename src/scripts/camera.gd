@@ -25,7 +25,7 @@ func _process(delta: float) -> void:
 	free_bottom = sensor_bottom.get_overlapping_areas().size()
 	
 	if player:
-		target_pos = player.global_position
+		target_pos = player.global_position - Vector2(0.0, 0.5)
 	
 	if target_pos:
 		var target_dir := global_position.direction_to(target_pos)
