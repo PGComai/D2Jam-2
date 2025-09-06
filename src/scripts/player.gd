@@ -46,7 +46,8 @@ var wall_stick: int = 0
 var jump_coyote: int = 0
 var jump_released := false
 var history: Array[HistoryState] = []
-var ghosts: Array[Ghost]
+var ghosts: Array[Ghost] = []
+var placed_ghosts: Array[Ghost] = []
 
 
 @onready var label: Label = $Label
@@ -244,4 +245,17 @@ func _physics_process(delta: float) -> void:
 		new_ghost.player = self
 		add_child(new_ghost)
 		ghosts.append(new_ghost)
-		print("new_ghost: %s" % new_ghost.idx)
+	
+	if Input.is_action_just_pressed("place"):
+		var rghosts := ghosts.duplicate()
+		rghosts.reverse()
+		
+		var chosen_ghost: Ghost
+		
+		for ghost: Ghost in rghosts:
+			if not ghost.placement and not ghost.placed:
+				chosen_ghost = ghost
+				break
+		
+		if chosen_ghost:
+			chosen_ghost.placement = ((chosen_ghost.idx) * Ghost.INTERVAL) + Ghost.INTERVAL - 1
