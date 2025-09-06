@@ -15,7 +15,7 @@ const GRAV: float = 1.2
 const JUMP_HOLD: float = 0.3
 const WALL_FRICTION: float = 0.1
 const HOLD_DIVISOR: float = 2.5
-const JUMP_BUFFER: int = 16
+const JUMP_BUFFER: int = 8
 const ENTER_WALL_VEL: float = 50.0
 const TERMINAL_VEL: float = 300.0
 const WALL_STICK_FRAMES: int = 30
@@ -66,8 +66,12 @@ func movement_on_floor(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
-		jump_released = false
+		if not jump_buffer:
+			jump_released = false
+		else:
+			jump_released = !Input.is_action_pressed("jump")
 		jump_coyote = 0
+		jump_buffer = 0
 	else:
 		jump_coyote = COYOTE_FRAMES
 
@@ -102,8 +106,12 @@ func movement_on_wall(delta: float) -> void:
 		velocity = Vector2(diagonal_vel.x, -JUMP * WALL_JUMP_Y_SCALE)
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal.x
-		jump_released = false
+		if not jump_buffer:
+			jump_released = false
+		else:
+			jump_released = !Input.is_action_pressed("jump")
 		wall_jump_coyote = 0
+		jump_buffer = 0
 		wall_stick = WALL_STICK_FRAMES
 	else:
 		wall_jump_coyote = WALL_COYOTE_FRAMES
@@ -126,8 +134,6 @@ func movement_ascending(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer = JUMP_BUFFER
-	else:
-		jump_buffer = 0
 
 
 func movement_falling(delta: float) -> void:
@@ -140,8 +146,6 @@ func movement_falling(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer = JUMP_BUFFER
-	else:
-		jump_buffer = 0
 
 
 func movement_floor_coyote(delta: float) -> void:
@@ -151,8 +155,12 @@ func movement_floor_coyote(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
-		jump_released = false
+		if not jump_buffer:
+			jump_released = false
+		else:
+			jump_released = !Input.is_action_pressed("jump")
 		jump_coyote = 0
+		jump_buffer = 0
 
 
 func movement_wall_coyote(delta: float) -> void:
@@ -166,8 +174,12 @@ func movement_wall_coyote(delta: float) -> void:
 		velocity = Vector2(diagonal_vel.x, -JUMP * WALL_JUMP_Y_SCALE)
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal_coyote.x
-		jump_released = false
+		if not jump_buffer:
+			jump_released = false
+		else:
+			jump_released = !Input.is_action_pressed("jump")
 		wall_jump_coyote = 0
+		jump_buffer = 0
 		wall_stick = WALL_STICK_FRAMES
 
 
