@@ -10,6 +10,7 @@ const WALL_FRICTION: float = 0.1
 const HOLD_DIVISOR: float = 4.0
 const JUMP_BUFFER: int = 16
 const ENTER_WALL_VEL: float = 30.0
+const TERMINAL_VEL: float = 300.0
 
 
 enum States {ON_FLOOR,
@@ -61,6 +62,7 @@ func movement_on_wall(delta: float) -> void:
 	wall_normal_coyote = wall_normal
 	
 	velocity.x = input_x * SPEED
+	velocity.x -= wall_normal.x * 50.0
 	
 	jump_coyote = 0
 	
@@ -115,6 +117,7 @@ func movement_falling(delta: float) -> void:
 	var target_x_vel: float = lerpf(input_x * SPEED, velocity.x, wall_jump_effect)
 	velocity.x = lerpf(velocity.x, target_x_vel, 0.3)
 	velocity += get_gravity() * delta * GRAV
+	velocity.y = minf(velocity.y, TERMINAL_VEL)
 	
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer = JUMP_BUFFER
