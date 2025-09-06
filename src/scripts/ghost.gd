@@ -5,11 +5,18 @@ class_name Ghost
 const INTERVAL: int = 20
 const GHOST_SPRITE = preload("res://scenes/ghost_sprite.tscn")
 const GHOST_COLLIDER = preload("res://scenes/ghost_collider.tscn")
+const GHOST_TARGET = preload("res://scenes/ghost_target.tscn")
 
 
 var player: Player
 var idx: int = 0
-var placement: int
+var placement: int = 0:
+	set(value):
+		if value > placement:
+			if player:
+				target.visible = true
+				target.global_position = player.global_position
+		placement = value
 var placed := false:
 	set(value):
 		placed = value
@@ -17,6 +24,7 @@ var placed := false:
 			collider.set_collision_layer_value(1, placed)
 			collider.set_collision_mask_value(1, placed)
 var collider: StaticBody2D
+var target: Sprite2D
 
 
 func _ready() -> void:
@@ -25,6 +33,9 @@ func _ready() -> void:
 	var new_collider = GHOST_COLLIDER.instantiate()
 	add_child(new_collider)
 	collider = new_collider
+	var new_target = GHOST_TARGET.instantiate()
+	add_child(new_target)
+	target = new_target
 	top_level = true
 
 
@@ -34,6 +45,7 @@ func _physics_process(delta: float) -> void:
 			placement -= 1
 			if placement == 0:
 				placed = true
+				target.visible = false
 		
 		if placed:
 			pass

@@ -258,4 +258,4 @@ func _physics_process(delta: float) -> void:
 				break
 		
 		if chosen_ghost:
-			chosen_ghost.placement = ((chosen_ghost.idx) * Ghost.INTERVAL) + Ghost.INTERVAL - 1
+			chosen_ghost.placement = ((chosen_ghost.idx) * Ghost.INTERVAL) + Ghost.INTERVAL + 1
