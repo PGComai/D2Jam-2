@@ -7,7 +7,9 @@ const ACCEL: float = 0.1
 const GRAV: float = 1.5
 const JUMP_HOLD: float = 0.4
 const WALL_FRICTION: float = 0.1
-const HOLD_DIVISOR: float = 3.0
+const HOLD_DIVISOR: float = 4.0
+const JUMP_BUFFER: int = 16
+const ENTER_WALL_VEL: float = 30.0
 
 
 enum States {ON_FLOOR,
@@ -15,10 +17,11 @@ enum States {ON_FLOOR,
 			ASCENDING,
 			FALLING,
 			FLOOR_COYOTE,
-			WALL_COYOTE,}
+			WALL_COYOTE}
 
 
 var state: States = States.ON_FLOOR
+var state_last_frame: States = States.ON_FLOOR
 var jump_buffer: int = 0
 var wall_jump_effect: float = 0.0:
 	set(value):
@@ -42,17 +45,24 @@ func movement_on_floor(delta: float) -> void:
 	
 	velocity.x = input_x * SPEED
 	
-	if Input.is_action_just_pressed("jump"):
+	wall_jump_coyote = 0
+	
+	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
 		jump_released = false
-		#state = States.ASCENDING
+		jump_coyote = 0
+	else:
+		jump_coyote = 1
 
 
 func movement_on_wall(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	var wall_normal := get_wall_normal()
+	wall_normal_coyote = wall_normal
 	
 	velocity.x = input_x * SPEED
+	
+	jump_coyote = 0
 	
 	if velocity.y <= 0.0:
 		if Input.is_action_just_released("jump"):
@@ -64,15 +74,18 @@ func movement_on_wall(delta: float) -> void:
 			var hold_factor := 1.0 - pow(-clampf(velocity.y, (-JUMP/HOLD_DIVISOR), 0.0) / (JUMP/HOLD_DIVISOR), 2.0)
 			velocity += get_gravity() * delta * GRAV * lerpf(JUMP_HOLD, 1.0, hold_factor)
 	else:
+		if state_last_frame == States.FALLING:
+			velocity.y = minf(velocity.y, ENTER_WALL_VEL)
 		velocity += get_gravity() * delta * GRAV * WALL_FRICTION
 	
-	if Input.is_action_just_pressed("jump"):
-		#velocity.y = minf(velocity.y, 0.0)
+	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity = Vector2(wall_normal.x, -1.0).normalized() * JUMP
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal.x
 		jump_released = false
-		#state = States.ASCENDING
+		wall_jump_coyote = 0
+	else:
+		wall_jump_coyote = 2
 
 
 func movement_ascending(delta: float) -> void:
@@ -89,6 +102,11 @@ func movement_ascending(delta: float) -> void:
 	else:
 		var hold_factor := 1.0 - pow(-clampf(velocity.y, (-JUMP/HOLD_DIVISOR), 0.0) / (JUMP/HOLD_DIVISOR), 2.0)
 		velocity += get_gravity() * delta * GRAV * lerpf(JUMP_HOLD, 1.0, hold_factor)
+	
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer = JUMP_BUFFER
+	else:
+		jump_buffer = 0
 
 
 func movement_falling(delta: float) -> void:
@@ -97,6 +115,11 @@ func movement_falling(delta: float) -> void:
 	var target_x_vel: float = lerpf(input_x * SPEED, velocity.x, wall_jump_effect)
 	velocity.x = lerpf(velocity.x, target_x_vel, 0.3)
 	velocity += get_gravity() * delta * GRAV
+	
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer = JUMP_BUFFER
+	else:
+		jump_buffer = 0
 
 
 func movement_floor_coyote(delta: float) -> void:
@@ -104,14 +127,23 @@ func movement_floor_coyote(delta: float) -> void:
 	
 	velocity.x = input_x * SPEED
 	
-	if Input.is_action_just_pressed("jump"):
-		velocity.y -= JUMP
+	if Input.is_action_just_pressed("jump") or jump_buffer:
+		velocity.y = -JUMP
 		jump_released = false
-		state = States.ASCENDING
+		jump_coyote = 0
 
 
 func movement_wall_coyote(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
+	
+	velocity.x = input_x * SPEED
+	
+	if Input.is_action_just_pressed("jump") or jump_buffer:
+		velocity = Vector2(wall_normal_coyote.x, -1.0).normalized() * JUMP
+		wall_jump_effect = 1.0
+		last_wall_jump_dir = wall_normal_coyote.x
+		jump_released = false
+		wall_jump_coyote = 0
 
 
 func _physics_process(delta: float) -> void:
@@ -199,8 +231,6 @@ func _physics_process(delta: float) -> void:
 		#else:
 			#velocity.x = 0.0
 	
-	if wall_jump_effect:
-		wall_jump_effect -= delta * 1.5
 	
 	if state == States.ON_FLOOR:
 		label.text = "ON_FLOOR"
@@ -208,6 +238,12 @@ func _physics_process(delta: float) -> void:
 	elif state == States.ON_WALL:
 		label.text = "ON_WALL"
 		movement_on_wall(delta)
+	elif state == States.FLOOR_COYOTE:
+		label.text = "FLOOR_COYOTE"
+		movement_floor_coyote(delta)
+	elif state == States.WALL_COYOTE:
+		label.text = "WALL_COYOTE"
+		movement_wall_coyote(delta)
 	elif state == States.ASCENDING:
 		label.text = "ASCENDING"
 		movement_ascending(delta)
@@ -217,11 +253,26 @@ func _physics_process(delta: float) -> void:
 	
 	move_and_slide()
 	
+	state_last_frame = state
+	
 	if is_on_floor():
 		state = States.ON_FLOOR
 	elif is_on_wall():
 		state = States.ON_WALL
+	elif jump_coyote:
+		state = States.FLOOR_COYOTE
+	elif wall_jump_coyote:
+		state = States.WALL_COYOTE
 	elif velocity.y > 0.0:
 		state = States.FALLING
 	else:
 		state = States.ASCENDING
+	
+	if wall_jump_effect:
+		wall_jump_effect -= delta * 1.5
+	if jump_coyote:
+		jump_coyote -= 1
+	if wall_jump_coyote:
+		wall_jump_coyote -= 1
+	if jump_buffer:
+		jump_buffer -= 1

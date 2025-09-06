@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://disfy1cxcdva2"]
+
+[ext_resource type="Script" uid="uid://bjl3js4sdyynd" path="res://scripts/camera_tile.gd" id="1_yyl1k"]
+
+[node name="CameraTile" type="Area2D" groups=["camera_tile"]]
+script = ExtResource("1_yyl1k")
