@@ -20,7 +20,7 @@ const ENTER_WALL_VEL: float = 50.0
 const TERMINAL_VEL: float = 300.0
 const WALL_STICK_FRAMES: int = 30
 const WALL_COYOTE_FRAMES: int = 2
-const COYOTE_FRAMES: int = 1
+const COYOTE_FRAMES: int = 3
 const WALL_JUMP_EFFECT_DECAY: float = 1.3
 const WALL_JUMP_Y_SCALE: float = 0.8
 
