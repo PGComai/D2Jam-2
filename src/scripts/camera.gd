@@ -83,7 +83,7 @@ func _process(delta: float) -> void:
 			free_bottom = false
 			bad_bottom = true
 	
-	var player_y_pan := Input.get_axis("up", "down") * 24.0
+	var player_y_pan := Input.get_axis("up", "down") * 36.0
 	var no_pan_if := Input.get_axis("left", "right")
 	
 	
