@@ -27,6 +27,7 @@ var placed := false:
 			collider.set_collision_mask_value(1, placed)
 var collider: StaticBody2D
 var target: Sprite2D
+var room: int = 0
 
 
 func _ready() -> void:

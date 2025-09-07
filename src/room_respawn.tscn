@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://ibusl6l8kkgi"]
+
+[ext_resource type="Texture2D" uid="uid://tabwpvnuyt3n" path="res://misc/room_respawn.tres" id="1_1tp7e"]
+[ext_resource type="Script" uid="uid://djc3gkmth2kc5" path="res://scripts/room_respawn.gd" id="1_wgerd"]
+
+[node name="RoomRespawn" type="Sprite2D"]
+modulate = Color(1, 0.32549, 1, 0.615686)
+texture = ExtResource("1_1tp7e")
+script = ExtResource("1_wgerd")

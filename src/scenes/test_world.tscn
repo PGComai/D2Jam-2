@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=4 uid="uid://chetbqybmbf2c"]
+[gd_scene load_steps=9 format=4 uid="uid://chetbqybmbf2c"]
 
 [ext_resource type="TileSet" uid="uid://cyhfkbmrhdpe6" path="res://misc/tileset.tres" id="1_umbte"]
 [ext_resource type="PackedScene" uid="uid://dfc75f4nbnwy5" path="res://scenes/player.tscn" id="2_amxg5"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://bwf1x1yhdh7ae" path="res://scenes/camera.tscn" id="3_umbte"]
 [ext_resource type="Script" uid="uid://b5je1nsl532xm" path="res://scripts/ghost_get.gd" id="5_ynswa"]
 [ext_resource type="PackedScene" uid="uid://bqscpqasmrrjp" path="res://scenes/virtual_camera.tscn" id="6_dvny0"]
+[ext_resource type="Texture2D" uid="uid://tabwpvnuyt3n" path="res://misc/room_respawn.tres" id="7_nrstc"]
+[ext_resource type="Script" uid="uid://djc3gkmth2kc5" path="res://scripts/room_respawn.gd" id="7_xwrkq"]
 
 [node name="TestWorld" type="Node2D"]
 
@@ -76,7 +78,37 @@ metadata/_custom_type_script = "uid://bjl3js4sdyynd"
 
 [node name="GhostGet" type="Area2D" parent="GhostGets"]
 position = Vector2(133, 121)
+collision_mask = 9
 script = ExtResource("5_ynswa")
+
+[node name="GhostGet2" type="Area2D" parent="GhostGets"]
+position = Vector2(199, 96)
+collision_mask = 9
+script = ExtResource("5_ynswa")
+metadata/_custom_type_script = "uid://b5je1nsl532xm"
+
+[node name="GhostGet3" type="Area2D" parent="GhostGets"]
+position = Vector2(263, 72)
+collision_mask = 9
+script = ExtResource("5_ynswa")
+metadata/_custom_type_script = "uid://b5je1nsl532xm"
+
+[node name="Respawns" type="Node2D" parent="."]
+
+[node name="RoomRespawn" type="Sprite2D" parent="Respawns"]
+modulate = Color(1, 0.32549, 1, 0.615686)
+position = Vector2(30, 137)
+texture = ExtResource("7_nrstc")
+script = ExtResource("7_xwrkq")
+metadata/_custom_type_script = "uid://djc3gkmth2kc5"
+
+[node name="RoomRespawn2" type="Sprite2D" parent="Respawns"]
+modulate = Color(1, 0.32549, 1, 0.615686)
+position = Vector2(330, 73)
+texture = ExtResource("7_nrstc")
+script = ExtResource("7_xwrkq")
+room = 1
+metadata/_custom_type_script = "uid://djc3gkmth2kc5"
 
 [connection signal="room_changed" from="Player" to="VirtualCamera" method="_on_player_room_changed"]
 [connection signal="room_changed" from="Player" to="Camera2D" method="_on_player_room_changed"]
