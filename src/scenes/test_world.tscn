@@ -130,5 +130,7 @@ script = ExtResource("7_xwrkq")
 room = 1
 metadata/_custom_type_script = "uid://djc3gkmth2kc5"
 
+[node name="DeathZones" type="Node2D" parent="."]
+
 [connection signal="room_changed" from="Player" to="VirtualCamera" method="_on_player_room_changed"]
 [connection signal="room_changed" from="Player" to="Camera2D" method="_on_player_room_changed"]
