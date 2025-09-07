@@ -32,6 +32,7 @@ var target: Sprite2D
 func _ready() -> void:
 	var new_sprite = GHOST_SPRITE.instantiate()
 	add_child(new_sprite)
+	new_sprite.position.y = -1.0
 	var new_collider = GHOST_COLLIDER.instantiate()
 	add_child(new_collider)
 	collider = new_collider

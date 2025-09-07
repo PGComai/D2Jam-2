@@ -26,8 +26,8 @@ func _ready() -> void:
 func _on_body_entered(body) -> void:
 	if body.is_in_group("player"):
 		var player: Player = body
-		player.room = room
 		player.room_center = global_position
+		player.room = room
 
 
 func _on_body_exited(body) -> void:

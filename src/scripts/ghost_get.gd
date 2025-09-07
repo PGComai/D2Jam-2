@@ -16,7 +16,7 @@ func _ready() -> void:
 		add_child(new_collider)
 		add_to_group("ghost_get")
 		var new_sprite = GHOST_SPRITE.instantiate()
-		new_sprite.modulate = Color.BLUE
+		new_sprite.modulate = Color.LIGHT_GREEN
 		add_child(new_sprite)
 		
 		body_entered.connect(_on_body_entered)
@@ -26,3 +26,4 @@ func _on_body_entered(body) -> void:
 	if body.is_in_group("player"):
 		var player: Player = body
 		player.call_deferred("add_ghost")
+		queue_free()

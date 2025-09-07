@@ -3,7 +3,6 @@
 [ext_resource type="Texture2D" uid="uid://bbvloc46nouav" path="res://sprites/penguin.png" id="1_uf8kf"]
 
 [node name="Sprite2D" type="Sprite2D"]
-modulate = Color(1, 1, 1, 0.192157)
+modulate = Color(1, 1, 1, 0.403922)
 z_index = -1
-position = Vector2(0, -1)
 texture = ExtResource("1_uf8kf")

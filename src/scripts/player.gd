@@ -205,9 +205,10 @@ func add_ghost() -> void:
 
 
 func evaluate_room() -> void:
-	var room_area: CameraTile = room_detector.get_overlapping_areas()[0]
-	room = room_area.room
-	room_center = room_area.global_position
+	if room_detector.get_overlapping_areas():
+		var room_area: CameraTile = room_detector.get_overlapping_areas()[0]
+		room_center = room_area.global_position
+		room = room_area.room
 
 
 func _physics_process(delta: float) -> void:
@@ -229,6 +230,11 @@ func _physics_process(delta: float) -> void:
 	elif state == States.FALLING:
 		label.text = "FALLING"
 		movement_falling(delta)
+	
+	if velocity.x > 0.0:
+		room_detector.position.x = 4.0
+	elif velocity.x < 0.0:
+		room_detector.position.x = -4.0 
 	
 	move_and_slide()
 	
@@ -301,3 +307,10 @@ func _physics_process(delta: float) -> void:
 			history_state.state = state
 	if Input.is_action_just_pressed("respawn"):
 		global_position = spawn_pos
+		room_changed.emit()
+
+
+func _on_room_detector_area_entered(area: Area2D) -> void:
+	var room_area: CameraTile = area
+	room_center = room_area.global_position
+	room = room_area.room

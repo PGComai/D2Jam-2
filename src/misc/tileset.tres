@@ -1,6 +1,7 @@
-[gd_resource type="TileSet" load_steps=4 format=3 uid="uid://cyhfkbmrhdpe6"]
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://cyhfkbmrhdpe6"]
 
 [ext_resource type="Texture2D" uid="uid://mll2u27jas0c" path="res://sprites/atlas_basic_8x8.png" id="1_w5yoa"]
+[ext_resource type="Texture2D" uid="uid://cgio4rmndggii" path="res://sprites/ice-tiles.png" id="2_dlgr8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_umbte"]
 resource_name = "invisible walls"
@@ -430,7 +431,7 @@ texture_region_size = Vector2i(8, 8)
 8:4/0/terrains_peering_bit/top_side = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_amxg5"]
-texture = ExtResource("1_w5yoa")
+texture = ExtResource("2_dlgr8")
 texture_region_size = Vector2i(8, 8)
 0:0/0 = 0
 0:0/0/terrain_set = 0

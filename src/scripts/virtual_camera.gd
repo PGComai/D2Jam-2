@@ -1,8 +1,7 @@
-extends Camera2D
+extends Node2D
 
 
 @export var player: Player
-@export var virtual_camera: Node2D
 
 
 var free_left := false
@@ -22,6 +21,10 @@ var goto_new_center := false
 
 func _process(delta: float) -> void:
 	var target_pos: Vector2
+	
+	if goto_new_center:
+		global_position = new_room_center
+		goto_new_center = false
 	
 	free_left = sensor_left.get_overlapping_areas().size()
 	free_right = sensor_right.get_overlapping_areas().size()
@@ -65,14 +68,9 @@ func _process(delta: float) -> void:
 	if player:
 		target_pos = player.global_position - Vector2(0.0, 0.5)
 	
-	if goto_new_center:
-		global_position = global_position.lerp(virtual_camera.global_position, 0.15)
-		if global_position.is_equal_approx(virtual_camera.global_position):
-			global_position = virtual_camera.global_position
-			goto_new_center = false
-	elif target_pos:
+	if target_pos:
 		var target_dir := global_position.direction_to(target_pos)
-		var next_pos := global_position.lerp(target_pos, 0.2)
+		var next_pos := target_pos
 		
 		if target_dir.x < 0.0:
 			if not free_left:
