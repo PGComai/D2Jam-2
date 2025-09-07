@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dv0jmix13qx3q"]
+
+[ext_resource type="Script" uid="uid://bmcwgimh0p1b8" path="res://scripts/victory_zone.gd" id="1_4da8e"]
+
+[node name="VictoryZone" type="Area2D"]
+script = ExtResource("1_4da8e")
