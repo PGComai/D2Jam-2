@@ -48,13 +48,14 @@ var jump_released := false
 var history: Array[HistoryState] = []
 var ghosts: Array[Ghost] = []
 var placed_ghosts: Array[Ghost] = []
+var spawn_pos: Vector2
 
 
 @onready var label: Label = $Label
 
 
 func _ready() -> void:
-	pass
+	spawn_pos = global_position
 
 
 func movement_on_floor(delta: float) -> void:
@@ -259,3 +260,9 @@ func _physics_process(delta: float) -> void:
 		
 		if chosen_ghost:
 			chosen_ghost.placement = ((chosen_ghost.idx) * Ghost.INTERVAL) + Ghost.INTERVAL + 1
+			placed_ghosts.append(chosen_ghost)
+	if Input.is_action_just_pressed("clear_ghosts"):
+		for pghost: Ghost in placed_ghosts:
+			pghost.placed = false
+	if Input.is_action_just_pressed("respawn"):
+		global_position = spawn_pos
