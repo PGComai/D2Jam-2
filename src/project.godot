@@ -31,6 +31,10 @@ ghost_get=""
 player=""
 respawn=""
 
+[gui]
+
+fonts/dynamic_fonts/use_oversampling=false
+
 [input]
 
 left={

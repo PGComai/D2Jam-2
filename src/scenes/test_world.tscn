@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bqscpqasmrrjp" path="res://scenes/virtual_camera.tscn" id="6_dvny0"]
 [ext_resource type="Texture2D" uid="uid://tabwpvnuyt3n" path="res://misc/room_respawn.tres" id="7_nrstc"]
 [ext_resource type="Script" uid="uid://djc3gkmth2kc5" path="res://scripts/room_respawn.gd" id="7_xwrkq"]
+
 [ext_resource type="Script" path="res://scripts/death_zone.gd" id="10_ar7ra"]
 
 [node name="TestWorld" type="Node2D"]
@@ -246,6 +247,9 @@ metadata/_custom_type_script = "uid://djc3gkmth2kc5"
 
 [node name="DeathZones" type="Node2D" parent="."]
 
+
+[connection signal="fish_get" from="Player" to="Camera2D" method="_on_player_fish_get"]
+[connection signal="respawned" from="Player" to="Camera2D" method="_on_player_respawned"]
 [node name="DeathZone" type="Area2D" parent="DeathZones"]
 position = Vector2(320, 226)
 script = ExtResource("10_ar7ra")
@@ -273,3 +277,6 @@ size = Vector2i(312, 60)
 
 [connection signal="room_changed" from="Player" to="VirtualCamera" method="_on_player_room_changed"]
 [connection signal="room_changed" from="Player" to="Camera2D" method="_on_player_room_changed"]
+[connection signal="victory" from="Player" to="Player" method="_on_victory"]
+[connection signal="victory" from="Player" to="Camera2D" method="_on_player_victory"]
+[connection signal="player_can_move_again" from="Camera2D" to="Player" method="_on_camera_2d_player_can_move_again"]

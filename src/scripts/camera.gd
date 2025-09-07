@@ -4,6 +4,9 @@ extends Camera2D
 const PAN_WAIT: int = 16
 
 
+signal player_can_move_again
+
+
 @export var player: Player
 @export var virtual_camera: Node2D
 
@@ -17,15 +20,28 @@ var new_room_center: Vector2
 var goto_new_center := false
 var pan_wait_frames: int = PAN_WAIT
 var room_tiles: Array[CameraTile] = []
+var timer_start_time: int
+var victory := false
 
 
 @onready var sensor_left: Area2D = $SensorLeft
 @onready var sensor_right: Area2D = $SensorRight
 @onready var sensor_top: Area2D = $SensorTop
 @onready var sensor_bottom: Area2D = $SensorBottom
+@onready var label_time: Label = $LabelTime
+@onready var label_feesh: Label = $HBoxContainer/LabelFeesh
+@onready var victory_timer: Timer = $VictoryTimer
+@onready var label_victory: Label = $LabelVictory
+
+
+func _ready() -> void:
+	timer_start_time = Time.get_ticks_usec()
 
 
 func _process(delta: float) -> void:
+	if not victory:
+		label_time.text = stringify_time(Time.get_ticks_usec() - timer_start_time)
+	
 	var target_pos: Vector2
 	
 	free_left = sensor_left.get_overlapping_areas().size()
@@ -131,3 +147,51 @@ func _on_player_room_changed() -> void:
 		if ct.room == player.room:
 			room_tiles.append(ct)
 	goto_new_center = true
+
+
+func _on_player_fish_get() -> void:
+	if player:
+		label_feesh.text = str(player.fish_count)
+
+
+func _on_player_respawned() -> void:
+	if player:
+		if not player.rooms_completed.size():
+			timer_start_time = Time.get_ticks_usec()
+
+
+func stringify_time(_time: int) -> String:
+	var minutes: int = (int(float(_time) / 1000000.0)) / 60
+	var seconds = str((float(_time) / 1000000.0) - float(minutes * 60))
+	var slice1 = seconds.get_slice(".", 0)
+	if slice1.length() == 1:
+		slice1 = "0" + slice1
+	
+	var slice2 = seconds.get_slice(".", 1).substr(0, 2)
+	if slice2.length() == 0:
+		slice2 = "00"
+	elif slice2.length() == 1:
+		slice2 = slice2 + "0"
+		
+	var slice3 = seconds.get_slice(".", 1).substr(2, 2)
+	if slice3.length() == 0:
+		slice3 = "00"
+	elif slice3.length() == 1:
+		slice3 = slice3 + "0"
+	
+	var min_string = str(minutes)
+	if min_string.length() < 2:
+		min_string = "0" + min_string
+	
+	return min_string + ":" + slice1 + ":" + slice2
+
+
+func _on_player_victory() -> void:
+	victory = true
+	victory_timer.start()
+	label_victory.visible = true
+
+
+func _on_victory_timer_timeout() -> void:
+	label_victory.visible = false
+	player_can_move_again.emit()

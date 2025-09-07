@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://t4eab8pywy1t"]
+
+[ext_resource type="Script" uid="uid://cs3ngofy3di0g" path="res://scripts/feesh.gd" id="1_00luc"]
+[ext_resource type="Texture2D" uid="uid://0184fvk3qcxq" path="res://sprites/feesh.tres" id="1_n4uig"]
+
+[node name="Feesh" type="Sprite2D"]
+texture = ExtResource("1_n4uig")
+script = ExtResource("1_00luc")

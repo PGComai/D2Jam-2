@@ -26,6 +26,9 @@ const WALL_JUMP_Y_SCALE: float = 0.8
 
 
 signal room_changed
+signal fish_get
+signal respawned
+signal victory
 
 
 enum States {ON_FLOOR,
@@ -67,6 +70,11 @@ var room: int = 0:
 				spawn_pos = rs.global_position
 var room_center: Vector2
 var rooms_completed: Array[int] = []
+var fish_count: int = 0:
+	set(value):
+		fish_count = value
+		fish_get.emit()
+var frozen := false
 
 
 @onready var label: Label = $Label
@@ -249,7 +257,8 @@ func _physics_process(delta: float) -> void:
 	elif velocity.x < 0.0:
 		room_detector.position.x = -4.0 
 	
-	move_and_slide()
+	if not frozen:
+		move_and_slide()
 	
 	var last_collision := get_last_slide_collision()
 	var invisible_wall := false
@@ -336,9 +345,18 @@ func respawn() -> void:
 		lg.ghost_get.active = true
 		lg.queue_free()
 	room_changed.emit()
+	respawned.emit()
 
 
 func _on_room_detector_area_entered(area: Area2D) -> void:
 	var room_area: CameraTile = area
 	room_center = room_area.global_position
 	room = room_area.room
+
+
+func _on_camera_2d_player_can_move_again() -> void:
+	frozen = false
+
+
+func _on_victory() -> void:
+	frozen = true
