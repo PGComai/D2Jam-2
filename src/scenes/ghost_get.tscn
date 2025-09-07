@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://t25ponvpnut6"]
+
+[ext_resource type="Script" uid="uid://b5je1nsl532xm" path="res://scripts/ghost_get.gd" id="1_erg4w"]
+
+[node name="GhostGet" type="Area2D"]
+script = ExtResource("1_erg4w")

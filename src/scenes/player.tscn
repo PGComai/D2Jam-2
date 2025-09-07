@@ -8,7 +8,8 @@ size = Vector2(8, 14)
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
 size = Vector2(8, 17)
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" groups=["player"]]
+collision_layer = 9
 script = ExtResource("1_4flbx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -33,3 +34,10 @@ theme_override_font_sizes/font_size = 8
 text = "ON_FLOOR"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="RoomDetector" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomDetector"]
+shape = SubResource("RectangleShape2D_sh265")
