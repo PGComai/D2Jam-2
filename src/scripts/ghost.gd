@@ -16,6 +16,8 @@ var placement: int = 0:
 			if player:
 				target.visible = true
 				target.global_position = player.global_position
+		elif value == 0:
+			target.visible = false
 		placement = value
 var placed := false:
 	set(value):
