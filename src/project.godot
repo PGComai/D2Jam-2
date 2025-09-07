@@ -29,6 +29,7 @@ camera_tile=""
 invisible_wall=""
 ghost_get=""
 player=""
+respawn=""
 
 [input]
 

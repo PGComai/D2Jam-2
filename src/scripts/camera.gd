@@ -1,6 +1,9 @@
 extends Camera2D
 
 
+const PAN_WAIT: int = 16
+
+
 @export var player: Player
 @export var virtual_camera: Node2D
 
@@ -12,6 +15,7 @@ var free_bottom := false
 
 var new_room_center: Vector2
 var goto_new_center := false
+var pan_wait_frames: int = PAN_WAIT
 
 
 @onready var sensor_left: Area2D = $SensorLeft
@@ -62,8 +66,19 @@ func _process(delta: float) -> void:
 			free_bottom = false
 			bad_bottom = true
 	
+	var player_y_pan := Input.get_axis("up", "down") * 24.0
+	var no_pan_if := Input.get_axis("left", "right")
+	
+	
 	if player:
 		target_pos = player.global_position - Vector2(0.0, 0.5)
+		if absf(no_pan_if) < 0.2 and player_y_pan:
+			if pan_wait_frames:
+				pan_wait_frames -= 1
+			else:
+				target_pos.y += player_y_pan
+		else:
+			pan_wait_frames = PAN_WAIT
 	
 	if goto_new_center:
 		global_position = global_position.lerp(virtual_camera.global_position, 0.15)

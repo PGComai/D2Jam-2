@@ -58,6 +58,9 @@ var room: int = 0:
 		room = value
 		if changed:
 			room_changed.emit()
+		for rs: RoomRespawn in get_tree().get_nodes_in_group("respawn"):
+			if rs.room == room:
+				spawn_pos = rs.global_position
 var room_center: Vector2
 
 
@@ -306,8 +309,12 @@ func _physics_process(delta: float) -> void:
 			history_state.pos = global_position
 			history_state.state = state
 	if Input.is_action_just_pressed("respawn"):
-		global_position = spawn_pos
-		room_changed.emit()
+		respawn()
+
+
+func respawn() -> void:
+	global_position = spawn_pos
+	room_changed.emit()
 
 
 func _on_room_detector_area_entered(area: Area2D) -> void:
