@@ -26,6 +26,9 @@ window/stretch/mode="viewport"
 [global_group]
 
 camera_tile=""
+invisible_wall=""
+ghost_get=""
+player=""
 
 [input]
 

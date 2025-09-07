@@ -25,6 +25,9 @@ const WALL_JUMP_EFFECT_DECAY: float = 1.3
 const WALL_JUMP_Y_SCALE: float = 0.8
 
 
+signal room_changed
+
+
 enum States {ON_FLOOR,
 			ON_WALL,
 			ASCENDING,
@@ -49,9 +52,17 @@ var history: Array[HistoryState] = []
 var ghosts: Array[Ghost] = []
 var placed_ghosts: Array[Ghost] = []
 var spawn_pos: Vector2
+var room: int = 0:
+	set(value):
+		var changed: bool = room != value
+		room = value
+		if changed:
+			room_changed.emit()
+var room_center: Vector2
 
 
 @onready var label: Label = $Label
+@onready var room_detector: Area2D = $RoomDetector
 
 
 func _ready() -> void:
@@ -61,7 +72,7 @@ func _ready() -> void:
 func movement_on_floor(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	
-	velocity.x = input_x * SPEED
+	velocity.x = signf(input_x) * SPEED
 	
 	wall_jump_coyote = 0
 	wall_stick = 0
@@ -84,7 +95,7 @@ func movement_on_wall(delta: float) -> void:
 	wall_normal_coyote = wall_normal
 	
 	if not wall_stick:
-		velocity.x = input_x * SPEED
+		velocity.x = signf(input_x) * SPEED
 	velocity.x -= wall_normal.x * 50.0
 	
 	jump_coyote = 0
@@ -122,7 +133,7 @@ func movement_on_wall(delta: float) -> void:
 func movement_ascending(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	
-	var target_x_vel: float = lerpf(input_x * SPEED, velocity.x, wall_jump_effect)
+	var target_x_vel: float = lerpf(signf(input_x) * SPEED, velocity.x, wall_jump_effect)
 	velocity.x = lerpf(velocity.x, target_x_vel, 0.3)
 	
 	if Input.is_action_just_released("jump"):
@@ -141,7 +152,7 @@ func movement_ascending(delta: float) -> void:
 func movement_falling(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	
-	var target_x_vel: float = lerpf(input_x * SPEED, velocity.x, wall_jump_effect)
+	var target_x_vel: float = lerpf(signf(input_x) * SPEED, velocity.x, wall_jump_effect)
 	velocity.x = lerpf(velocity.x, target_x_vel, 0.3)
 	velocity += get_gravity() * delta * GRAV
 	velocity.y = minf(velocity.y, TERMINAL_VEL)
@@ -153,7 +164,7 @@ func movement_falling(delta: float) -> void:
 func movement_floor_coyote(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	
-	velocity.x = input_x * SPEED
+	velocity.x = signf(input_x) * SPEED
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
@@ -169,7 +180,7 @@ func movement_wall_coyote(delta: float) -> void:
 	var input_x := Input.get_axis("left", "right")
 	
 	if not wall_stick:
-		velocity.x = input_x * SPEED
+		velocity.x = signf(input_x) * SPEED
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		var diagonal_vel := Vector2(wall_normal_coyote.x, -1.0).normalized() * JUMP
@@ -183,6 +194,20 @@ func movement_wall_coyote(delta: float) -> void:
 		wall_jump_coyote = 0
 		jump_buffer = 0
 		wall_stick = WALL_STICK_FRAMES
+
+
+func add_ghost() -> void:
+	var new_ghost := Ghost.new()
+	new_ghost.idx = ghosts.size()
+	new_ghost.player = self
+	add_child(new_ghost)
+	ghosts.append(new_ghost)
+
+
+func evaluate_room() -> void:
+	var room_area: CameraTile = room_detector.get_overlapping_areas()[0]
+	room = room_area.room
+	room_center = room_area.global_position
 
 
 func _physics_process(delta: float) -> void:
@@ -207,11 +232,19 @@ func _physics_process(delta: float) -> void:
 	
 	move_and_slide()
 	
+	var last_collision := get_last_slide_collision()
+	var invisible_wall := false
+	
+	if last_collision:
+		var last_collider := last_collision.get_collider()
+		if last_collider.is_in_group("invisible_wall"):
+			invisible_wall = true
+	
 	state_last_frame = state
 	
 	if is_on_floor():
 		state = States.ON_FLOOR
-	elif is_on_wall():
+	elif is_on_wall() and not invisible_wall:
 		state = States.ON_WALL
 	elif jump_coyote:
 		state = States.FLOOR_COYOTE
@@ -241,11 +274,7 @@ func _physics_process(delta: float) -> void:
 	if history.size() > MAX_HISTORY:
 		history.remove_at(0)
 	elif fmod(history.size(), Ghost.INTERVAL) == 0:
-		var new_ghost := Ghost.new()
-		new_ghost.idx = ghosts.size()
-		new_ghost.player = self
-		add_child(new_ghost)
-		ghosts.append(new_ghost)
+		pass
 	
 	if Input.is_action_just_pressed("place"):
 		var rghosts := ghosts.duplicate()
@@ -266,6 +295,7 @@ func _physics_process(delta: float) -> void:
 			pghost.placed = false
 		for ghost: Ghost in ghosts:
 			ghost.placement = 0
+		#global_position = spawn_pos
 		for history_state: HistoryState in history:
 			history_state.pos = global_position
 			history_state.state = state
