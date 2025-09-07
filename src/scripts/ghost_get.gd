@@ -33,14 +33,15 @@ func _enter_tree() -> void:
 	
 	set_collision_mask_value(4, true)
 	
-	body_entered.connect(_on_body_entered)
-	area_entered.connect(_on_area_entered)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
+		area_entered.connect(_on_area_entered)
 
 
 func _on_body_entered(body) -> void:
 	if body.is_in_group("player"):
 		var player: Player = body
-		player.call_deferred("add_ghost")
+		player.call_deferred("add_ghost", self)
 		active = false
 
 

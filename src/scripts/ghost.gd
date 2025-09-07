@@ -28,6 +28,8 @@ var placed := false:
 var collider: StaticBody2D
 var target: Sprite2D
 var room: int = 0
+var initializing := true
+var ghost_get: GhostGet
 
 
 func _ready() -> void:
@@ -41,6 +43,7 @@ func _ready() -> void:
 	add_child(new_target)
 	target = new_target
 	top_level = true
+	global_position = player.global_position
 
 
 func _physics_process(delta: float) -> void:
@@ -57,4 +60,8 @@ func _physics_process(delta: float) -> void:
 			var history_pos: int = -(idx + 1) * INTERVAL
 			var history_slice: Player.HistoryState = player.history[history_pos]
 			
-			global_position = history_slice.pos
+			if initializing:
+				if global_position.is_equal_approx(history_slice.pos):
+					initializing = false
+			else:
+				global_position = history_slice.pos

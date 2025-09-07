@@ -16,6 +16,7 @@ var free_bottom := false
 var new_room_center: Vector2
 var goto_new_center := false
 var pan_wait_frames: int = PAN_WAIT
+var room_tiles: Array[CameraTile] = []
 
 
 @onready var sensor_left: Area2D = $SensorLeft
@@ -89,17 +90,35 @@ func _process(delta: float) -> void:
 		var target_dir := global_position.direction_to(target_pos)
 		var next_pos := global_position.lerp(target_pos, 0.2)
 		
-		if target_dir.x < 0.0:
-			if not free_left:
+		var nearest_tile: CameraTile
+		var tile_dist: float = 10000000.0
+		
+		if room_tiles.size():
+			for rt: CameraTile in room_tiles:
+				var dist := next_pos.distance_squared_to(rt.global_position)
+				if dist < tile_dist:
+					nearest_tile = rt
+					tile_dist = dist
+		
+		if not free_left:
+			if nearest_tile:
+				next_pos.x = maxf(nearest_tile.global_position.x, next_pos.x)
+			else:
 				next_pos.x = global_position.x
-		if target_dir.x > 0.0:
-			if not free_right:
+		if not free_right:
+			if nearest_tile:
+				next_pos.x = minf(nearest_tile.global_position.x, next_pos.x)
+			else:
 				next_pos.x = global_position.x
-		if target_dir.y < 0.0:
-			if not free_top:
+		if not free_top:
+			if nearest_tile:
+				next_pos.y = maxf(nearest_tile.global_position.y, next_pos.y)
+			else:
 				next_pos.y = global_position.y
-		if target_dir.y > 0.0:
-			if not free_bottom:
+		if not free_bottom:
+			if nearest_tile:
+				next_pos.y = minf(nearest_tile.global_position.y, next_pos.y)
+			else:
 				next_pos.y = global_position.y
 		
 		global_position = next_pos
@@ -107,4 +126,8 @@ func _process(delta: float) -> void:
 
 func _on_player_room_changed() -> void:
 	new_room_center = player.room_center
+	room_tiles.clear()
+	for ct: CameraTile in get_tree().get_nodes_in_group("camera_tile"):
+		if ct.room == player.room:
+			room_tiles.append(ct)
 	goto_new_center = true

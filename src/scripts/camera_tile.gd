@@ -28,8 +28,9 @@ func _enter_tree() -> void:
 	set_collision_mask_value(4, true)
 	add_child(new_collider)
 	add_to_group("camera_tile")
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
+		body_exited.connect(_on_body_exited)
 	if Engine.is_editor_hint():
 		var new_label := Label.new()
 		new_label.text = str(room)
@@ -40,6 +41,7 @@ func _enter_tree() -> void:
 		ls.outline_size = 2.0
 		ls.outline_color = Color(0.0, 0.0, 0.0, 0.3)
 		label.label_settings = ls
+		label.label_settings.font_size = 32
 		label.z_index = 5
 
 

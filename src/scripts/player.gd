@@ -55,13 +55,18 @@ var spawn_pos: Vector2
 var room: int = 0:
 	set(value):
 		var changed: bool = room != value
+		var old_room := room
 		room = value
 		if changed:
+			if not rooms_completed.has(old_room) and not rooms_completed.has(room):
+				rooms_completed.append(old_room)
+				print("completed room %s" % old_room)
 			room_changed.emit()
 		for rs: RoomRespawn in get_tree().get_nodes_in_group("respawn"):
 			if rs.room == room:
 				spawn_pos = rs.global_position
 var room_center: Vector2
+var rooms_completed: Array[int] = []
 
 
 @onready var label: Label = $Label
@@ -69,7 +74,10 @@ var room_center: Vector2
 
 
 func _ready() -> void:
-	spawn_pos = global_position
+	for rs: RoomRespawn in get_tree().get_nodes_in_group("respawn"):
+		if rs.room == room:
+			spawn_pos = rs.global_position
+	room_changed.emit()
 
 
 func movement_on_floor(delta: float) -> void:
@@ -199,10 +207,12 @@ func movement_wall_coyote(delta: float) -> void:
 		wall_stick = WALL_STICK_FRAMES
 
 
-func add_ghost() -> void:
+func add_ghost(gg: GhostGet) -> void:
 	var new_ghost := Ghost.new()
 	new_ghost.idx = ghosts.size()
 	new_ghost.player = self
+	new_ghost.room = room
+	new_ghost.ghost_get = gg
 	add_child(new_ghost)
 	ghosts.append(new_ghost)
 
@@ -314,6 +324,17 @@ func _physics_process(delta: float) -> void:
 
 func respawn() -> void:
 	global_position = spawn_pos
+	var lost_ghosts: Array[Ghost] = []
+	for ghost: Ghost in ghosts:
+		if not rooms_completed.has(ghost.room):
+			lost_ghosts.append(ghost)
+	for lg: Ghost in lost_ghosts:
+		if ghosts.has(lg):
+			ghosts.erase(lg)
+		if placed_ghosts.has(lg):
+			placed_ghosts.erase(lg)
+		lg.ghost_get.active = true
+		lg.queue_free()
 	room_changed.emit()
 
 

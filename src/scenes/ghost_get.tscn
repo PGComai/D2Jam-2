@@ -3,4 +3,5 @@
 [ext_resource type="Script" uid="uid://b5je1nsl532xm" path="res://scripts/ghost_get.gd" id="1_erg4w"]
 
 [node name="GhostGet" type="Area2D"]
+collision_mask = 9
 script = ExtResource("1_erg4w")
