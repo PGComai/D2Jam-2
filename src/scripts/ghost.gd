@@ -2,7 +2,7 @@ extends Node2D
 class_name Ghost
 
 
-const INTERVAL: int = 20
+const INTERVAL: int = 10
 const GHOST_SPRITE = preload("res://scenes/ghost_sprite.tscn")
 const GHOST_COLLIDER = preload("res://scenes/ghost_collider.tscn")
 const GHOST_TARGET = preload("res://scenes/ghost_target.tscn")

@@ -67,7 +67,7 @@ func _process(delta: float) -> void:
 			free_bottom = false
 			bad_bottom = true
 	
-	var player_y_pan := Input.get_axis("up", "down") * 24.0
+	var player_y_pan := Input.get_axis("up", "down") * 36.0
 	var no_pan_if := Input.get_axis("left", "right")
 	
 	
@@ -88,7 +88,7 @@ func _process(delta: float) -> void:
 			goto_new_center = false
 	elif target_pos:
 		var target_dir := global_position.direction_to(target_pos)
-		var next_pos := global_position.lerp(target_pos, 0.2)
+		var next_pos := global_position.lerp(target_pos, 0.1)
 		
 		var nearest_tile: CameraTile
 		var tile_dist: float = 10000000.0
