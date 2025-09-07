@@ -3,7 +3,7 @@ extends Sprite2D
 class_name Feesh
 
 
-const FEESH = preload("res://sprites/feesh.tres")
+const FEESH = preload("res://sprites/flyfeesh.png")
 
 
 func _enter_tree() -> void:
