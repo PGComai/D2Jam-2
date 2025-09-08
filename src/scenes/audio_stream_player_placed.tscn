@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvl7ggje1i50i"]
+
+[ext_resource type="AudioStream" uid="uid://rwj88isnl8hm" path="res://sounds/puzzle planet carousel click.wav" id="1_kid12"]
+
+[node name="AudioStreamPlayerPlaced" type="AudioStreamPlayer"]
+stream = ExtResource("1_kid12")
+volume_db = -13.172

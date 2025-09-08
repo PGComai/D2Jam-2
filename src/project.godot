@@ -30,6 +30,7 @@ invisible_wall=""
 ghost_get=""
 player=""
 respawn=""
+ghost_collider=""
 
 [gui]
 

@@ -39,6 +39,9 @@ enum States {ON_FLOOR,
 			WALL_COYOTE}
 
 
+@export var penguins_make_sound := true
+
+
 var state: States = States.ON_FLOOR
 var state_last_frame: States = States.ON_FLOOR
 var jump_buffer: int = 0
@@ -75,10 +78,18 @@ var fish_count: int = 0:
 		fish_count = value
 		fish_get.emit()
 var frozen := false
+var touching_penguin_last_frame := false
 
 
 @onready var label: Label = $Label
 @onready var room_detector: Area2D = $RoomDetector
+@onready var penguin_audio_caw: AudioStreamPlayer2D = $PenguinAudioCaw
+@onready var penguin_audio_honk: AudioStreamPlayer2D = $PenguinAudioHonk
+@onready var penguin_audio_seagull: AudioStreamPlayer2D = $PenguinAudioSeagull
+@onready var penguin_audio_squawk: AudioStreamPlayer2D = $PenguinAudioSquawk
+@onready var penguin_audio_three_tier: AudioStreamPlayer2D = $PenguinAudioThreeTier
+@onready var penguin_audio_three_waaaa: AudioStreamPlayer2D = $PenguinAudioThreeWaaaa
+@onready var penguin_get: AudioStreamPlayer2D = $PenguinGet
 
 
 func _ready() -> void:
@@ -98,6 +109,11 @@ func movement_on_floor(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
+		if touching_penguin_last_frame:
+			random_penguin_call([penguin_audio_caw,
+								penguin_audio_honk,
+								penguin_audio_squawk,
+								penguin_audio_squawk])
 		if not jump_buffer:
 			jump_released = false
 		else:
@@ -136,6 +152,11 @@ func movement_on_wall(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		var diagonal_vel := Vector2(wall_normal.x, -1.0).normalized() * JUMP
 		velocity = Vector2(diagonal_vel.x, -JUMP * WALL_JUMP_Y_SCALE)
+		if touching_penguin_last_frame:
+			random_penguin_call([penguin_audio_seagull,
+								penguin_audio_three_waaaa,
+								penguin_audio_three_tier,
+								penguin_audio_honk])
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal.x
 		if not jump_buffer:
@@ -187,6 +208,11 @@ func movement_floor_coyote(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		velocity.y = -JUMP
+		if touching_penguin_last_frame:
+			random_penguin_call([penguin_audio_caw,
+								penguin_audio_honk,
+								penguin_audio_squawk,
+								penguin_audio_squawk])
 		if not jump_buffer:
 			jump_released = false
 		else:
@@ -204,6 +230,11 @@ func movement_wall_coyote(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") or jump_buffer:
 		var diagonal_vel := Vector2(wall_normal_coyote.x, -1.0).normalized() * JUMP
 		velocity = Vector2(diagonal_vel.x, -JUMP * WALL_JUMP_Y_SCALE)
+		if touching_penguin_last_frame:
+			random_penguin_call([penguin_audio_seagull,
+								penguin_audio_three_waaaa,
+								penguin_audio_three_tier,
+								penguin_audio_honk])
 		wall_jump_effect = 1.0
 		last_wall_jump_dir = wall_normal_coyote.x
 		if not jump_buffer:
@@ -221,6 +252,9 @@ func add_ghost(gg: GhostGet) -> void:
 	new_ghost.player = self
 	new_ghost.room = room
 	new_ghost.ghost_get = gg
+	penguin_get.play()
+	penguin_get.pitch_scale = randfn(1.0, 0.01)
+	
 	add_child(new_ghost)
 	ghosts.append(new_ghost)
 
@@ -267,6 +301,7 @@ func _physics_process(delta: float) -> void:
 		var last_collider := last_collision.get_collider()
 		if last_collider.is_in_group("invisible_wall"):
 			invisible_wall = true
+		touching_penguin_last_frame = last_collider.is_in_group("ghost_collider")
 	
 	state_last_frame = state
 	
@@ -311,7 +346,7 @@ func _physics_process(delta: float) -> void:
 		var chosen_ghost: Ghost
 		
 		for ghost: Ghost in rghosts:
-			if not ghost.placement and not ghost.placed:
+			if not ghost.placement and not ghost.placed and not ghost.player_in_way:
 				chosen_ghost = ghost
 				break
 		
@@ -360,3 +395,10 @@ func _on_camera_2d_player_can_move_again() -> void:
 
 func _on_victory() -> void:
 	frozen = true
+
+
+func random_penguin_call(audios: Array[AudioStreamPlayer2D]) -> void:
+	if penguins_make_sound:
+		var audio_player: AudioStreamPlayer2D = audios.pick_random()
+		audio_player.play()
+		audio_player.pitch_scale = randfn(1.25, 0.02)

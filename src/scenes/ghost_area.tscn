@@ -1,11 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpk8ag50vy611"]
+[gd_scene load_steps=2 format=3 uid="uid://cxq0l4kx5se4o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t76o2"]
 size = Vector2(8, 16)
 
-[node name="StaticBody2D" type="StaticBody2D" groups=["ghost_collider"]]
-collision_layer = 0
-collision_mask = 0
+[node name="Area2D" type="Area2D"]
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -1)
