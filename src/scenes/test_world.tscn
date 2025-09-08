@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bqscpqasmrrjp" path="res://scenes/virtual_camera.tscn" id="6_dvny0"]
 [ext_resource type="Texture2D" uid="uid://tabwpvnuyt3n" path="res://misc/room_respawn.tres" id="7_nrstc"]
 [ext_resource type="Script" uid="uid://djc3gkmth2kc5" path="res://scripts/room_respawn.gd" id="7_xwrkq"]
-[ext_resource type="Script" path="res://scripts/death_zone.gd" id="10_ar7ra"]
+[ext_resource type="Script" uid="uid://kbgif4qd3frr" path="res://scripts/death_zone.gd" id="10_ar7ra"]
 [ext_resource type="Texture2D" uid="uid://or70n44svsv4" path="res://sprites/flyfeesh.png" id="11_8hcw6"]
 [ext_resource type="Script" uid="uid://cs3ngofy3di0g" path="res://scripts/feesh.gd" id="12_mjm4b"]
 
