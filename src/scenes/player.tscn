@@ -11,7 +11,7 @@
 [ext_resource type="AudioStream" uid="uid://bi625s6p6o4rk" path="res://sounds/ufo-abduct-one.wav" id="9_ur7pv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sh265"]
-size = Vector2(8, 14)
+size = Vector2(8, 12)
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_g2els"]
 a = Vector2(0, -8)
@@ -22,6 +22,7 @@ collision_layer = 9
 script = ExtResource("1_4flbx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_sh265")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

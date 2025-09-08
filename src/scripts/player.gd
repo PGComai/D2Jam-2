@@ -356,8 +356,12 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("clear_ghosts"):
 		for pghost: Ghost in placed_ghosts:
 			pghost.placed = false
+		placed_ghosts.clear()
 		for ghost: Ghost in ghosts:
+			ghost.placed = false
 			ghost.placement = 0
+			if ghost.initializing:
+				ghost.initializing = false
 		#global_position = spawn_pos
 		for history_state: HistoryState in history:
 			history_state.pos = global_position
