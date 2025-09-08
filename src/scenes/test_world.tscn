@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=4 uid="uid://chetbqybmbf2c"]
+[gd_scene load_steps=13 format=4 uid="uid://chetbqybmbf2c"]
 
 [ext_resource type="TileSet" uid="uid://cyhfkbmrhdpe6" path="res://misc/tileset.tres" id="1_umbte"]
 [ext_resource type="Script" uid="uid://boyu6bxuuy1sc" path="res://scripts/invisible_walls.gd" id="2_7448y"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://tabwpvnuyt3n" path="res://misc/room_respawn.tres" id="7_nrstc"]
 [ext_resource type="Script" uid="uid://djc3gkmth2kc5" path="res://scripts/room_respawn.gd" id="7_xwrkq"]
 [ext_resource type="Script" uid="uid://kbgif4qd3frr" path="res://scripts/death_zone.gd" id="10_ar7ra"]
+[ext_resource type="Texture2D" uid="uid://or70n44svsv4" path="res://sprites/flyfeesh.png" id="11_8hcw6"]
+[ext_resource type="Script" uid="uid://cs3ngofy3di0g" path="res://scripts/feesh.gd" id="12_mjm4b"]
 
 [node name="TestWorld" type="Node2D"]
 
@@ -270,6 +272,15 @@ size = Vector2i(632, 60)
 position = Vector2(1444, -1034)
 script = ExtResource("10_ar7ra")
 size = Vector2i(312, 60)
+
+[node name="Feeshes" type="Node2D" parent="."]
+position = Vector2(160, 90)
+
+[node name="Feesh" type="Sprite2D" parent="Feeshes"]
+position = Vector2(105, -138)
+texture = ExtResource("11_8hcw6")
+script = ExtResource("12_mjm4b")
+metadata/_custom_type_script = "uid://cs3ngofy3di0g"
 
 [connection signal="fish_get" from="Player" to="Camera2D" method="_on_player_fish_get"]
 [connection signal="respawned" from="Player" to="Camera2D" method="_on_player_respawned"]
