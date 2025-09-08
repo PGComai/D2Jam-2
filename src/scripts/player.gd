@@ -23,6 +23,7 @@ const WALL_COYOTE_FRAMES: int = 2
 const COYOTE_FRAMES: int = 3
 const WALL_JUMP_EFFECT_DECAY: float = 1.3
 const WALL_JUMP_Y_SCALE: float = 0.8
+const RESET_HOLD: float = 1.0
 
 
 signal room_changed
@@ -75,10 +76,15 @@ var room_center: Vector2
 var rooms_completed: Array[int] = []
 var fish_count: int = 0:
 	set(value):
+		if value > fish_count:
+			if fish_get_audio:
+				fish_get_audio.play()
 		fish_count = value
 		fish_get.emit()
 var frozen := false
 var touching_penguin_last_frame := false
+var reset_hold: float = RESET_HOLD
+var respawn_hold: float = RESET_HOLD
 
 
 @onready var label: Label = $Label
@@ -92,6 +98,7 @@ var touching_penguin_last_frame := false
 @onready var penguin_get: AudioStreamPlayer2D = $PenguinGet
 @onready var jump_audio: AudioStreamPlayer2D = $JumpAudio
 @onready var land_audio: AudioStreamPlayer2D = $LandAudio
+@onready var fish_get_audio: AudioStreamPlayer = $FishGetAudio
 
 
 func _ready() -> void:
@@ -315,6 +322,11 @@ func _physics_process(delta: float) -> void:
 			land_audio.pitch_scale = randfn(3.5, 0.05)
 	elif is_on_wall() and not invisible_wall:
 		state = States.ON_WALL
+		if not touching_penguin_last_frame\
+		and (state_last_frame == States.FALLING
+			or state_last_frame == States.ASCENDING):
+			land_audio.play()
+			land_audio.pitch_scale = randfn(2.5, 0.05)
 	elif jump_coyote:
 		state = States.FLOOR_COYOTE
 	elif wall_jump_coyote:
@@ -372,6 +384,13 @@ func _physics_process(delta: float) -> void:
 		if chosen_ghost:
 			chosen_ghost.placement = ((chosen_ghost.idx) * Ghost.INTERVAL) + Ghost.INTERVAL + 1
 			placed_ghosts.append(chosen_ghost)
+	
+	var reset := false
+	var respawn := false
+	
+	#if Input.is_action_pressed("clear_ghosts"):
+		
+	
 	if Input.is_action_just_pressed("clear_ghosts"):
 		# make this work on half-placed ghosts
 		for pghost: Ghost in placed_ghosts:
