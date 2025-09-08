@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=4 uid="uid://chetbqybmbf2c"]
+[gd_scene load_steps=15 format=4 uid="uid://chetbqybmbf2c"]
 
 [ext_resource type="TileSet" uid="uid://cyhfkbmrhdpe6" path="res://misc/tileset.tres" id="1_umbte"]
 [ext_resource type="Script" uid="uid://boyu6bxuuy1sc" path="res://scripts/invisible_walls.gd" id="2_7448y"]
@@ -12,7 +12,8 @@
 [ext_resource type="Script" uid="uid://kbgif4qd3frr" path="res://scripts/death_zone.gd" id="10_ar7ra"]
 [ext_resource type="Texture2D" uid="uid://or70n44svsv4" path="res://sprites/flyfeesh.png" id="11_8hcw6"]
 [ext_resource type="Script" uid="uid://cs3ngofy3di0g" path="res://scripts/feesh.gd" id="12_mjm4b"]
-[ext_resource type="Script" uid="uid://bmcwgimh0p1b8" path="res://scripts/victory_zone.gd" id="13_mjm4b"]
+[ext_resource type="Script" path="res://scripts/victory_zone.gd" id="13_mjm4b"]
+[ext_resource type="Texture2D" uid="uid://cmaqy4w4ons3i" path="res://sprites/wings.png" id="14_dv75v"]
 
 [node name="TestWorld" type="Node2D"]
 
@@ -374,9 +375,10 @@ metadata/_custom_type_script = "uid://cs3ngofy3di0g"
 [node name="VictoryZones" type="Node2D" parent="."]
 
 [node name="VictoryZone" type="Area2D" parent="VictoryZones"]
-position = Vector2(1779, -1168)
+position = Vector2(1804, -1119)
 script = ExtResource("13_mjm4b")
-size = Vector2i(270, 180)
+size = Vector2i(24, 12)
+sprite = ExtResource("14_dv75v")
 
 [connection signal="fish_get" from="Player" to="Camera2D" method="_on_player_fish_get"]
 [connection signal="respawned" from="Player" to="Camera2D" method="_on_player_respawned"]
