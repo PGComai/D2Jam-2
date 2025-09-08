@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=5 format=3 uid="uid://b0htob1o1f1dk"]
+[gd_resource type="AudioBusLayout" load_steps=6 format=3 uid="uid://b0htob1o1f1dk"]
 
 [sub_resource type="AudioEffectCompressor" id="AudioEffectCompressor_j3pel"]
 resource_name = "Compressor"
@@ -17,6 +17,10 @@ pitch_scale = 0.25
 
 [sub_resource type="AudioEffectDistortion" id="AudioEffectDistortion_j3pel"]
 resource_name = "Distortion"
+
+[sub_resource type="AudioEffectLowPassFilter" id="AudioEffectLowPassFilter_j3pel"]
+resource_name = "LowPassFilter"
+cutoff_hz = 4272.0
 
 [resource]
 bus/1/name = &"Penguin"
@@ -39,3 +43,11 @@ bus/2/effect/0/effect = SubResource("AudioEffectPitchShift_j3pel")
 bus/2/effect/0/enabled = true
 bus/2/effect/1/effect = SubResource("AudioEffectDistortion_j3pel")
 bus/2/effect/1/enabled = false
+bus/3/name = &"Get"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = 0.0
+bus/3/send = &"Penguin"
+bus/3/effect/0/effect = SubResource("AudioEffectLowPassFilter_j3pel")
+bus/3/effect/0/enabled = true
