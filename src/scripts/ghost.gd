@@ -30,6 +30,7 @@ var target: Sprite2D
 var room: int = 0
 var initializing := true
 var ghost_get: GhostGet
+var player_in_way := false
 
 
 func _ready() -> void:
