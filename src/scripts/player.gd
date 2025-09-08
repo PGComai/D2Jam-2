@@ -90,6 +90,8 @@ var touching_penguin_last_frame := false
 @onready var penguin_audio_three_tier: AudioStreamPlayer2D = $PenguinAudioThreeTier
 @onready var penguin_audio_three_waaaa: AudioStreamPlayer2D = $PenguinAudioThreeWaaaa
 @onready var penguin_get: AudioStreamPlayer2D = $PenguinGet
+@onready var jump_audio: AudioStreamPlayer2D = $JumpAudio
+@onready var land_audio: AudioStreamPlayer2D = $LandAudio
 
 
 func _ready() -> void:
@@ -307,6 +309,10 @@ func _physics_process(delta: float) -> void:
 	
 	if is_on_floor():
 		state = States.ON_FLOOR
+		if not touching_penguin_last_frame\
+		and (state_last_frame == States.FALLING):
+			land_audio.play()
+			land_audio.pitch_scale = randfn(3.5, 0.05)
 	elif is_on_wall() and not invisible_wall:
 		state = States.ON_WALL
 	elif jump_coyote:
@@ -317,6 +323,19 @@ func _physics_process(delta: float) -> void:
 		state = States.FALLING
 	else:
 		state = States.ASCENDING
+		if not touching_penguin_last_frame\
+		and (state_last_frame != States.ASCENDING):
+			jump_audio.play()
+			jump_audio.pitch_scale = randfn(0.5, 0.02)
+	
+	if touching_penguin_last_frame\
+	and (state_last_frame == States.FALLING
+	or state_last_frame == States.ASCENDING)\
+	and (state == States.ON_FLOOR or state == States.ON_WALL):
+		random_penguin_call([penguin_audio_caw,
+								penguin_audio_honk,
+								penguin_audio_squawk,
+								penguin_audio_squawk], -10.0, -0.3)
 	
 	if wall_jump_effect:
 		wall_jump_effect -= delta * WALL_JUMP_EFFECT_DECAY
@@ -354,10 +373,16 @@ func _physics_process(delta: float) -> void:
 			chosen_ghost.placement = ((chosen_ghost.idx) * Ghost.INTERVAL) + Ghost.INTERVAL + 1
 			placed_ghosts.append(chosen_ghost)
 	if Input.is_action_just_pressed("clear_ghosts"):
+		# make this work on half-placed ghosts
 		for pghost: Ghost in placed_ghosts:
 			pghost.placed = false
+		placed_ghosts.clear()
 		for ghost: Ghost in ghosts:
+			ghost.placed = false
 			ghost.placement = 0
+			ghost.player_in_way = false
+			if ghost.initializing:
+				ghost.initializing = false
 		#global_position = spawn_pos
 		for history_state: HistoryState in history:
 			history_state.pos = global_position
@@ -397,8 +422,11 @@ func _on_victory() -> void:
 	frozen = true
 
 
-func random_penguin_call(audios: Array[AudioStreamPlayer2D]) -> void:
+func random_penguin_call(audios: Array[AudioStreamPlayer2D],
+						vol_mod: float = 0.0,
+						pitch_mod: float = 0.0) -> void:
 	if penguins_make_sound:
 		var audio_player: AudioStreamPlayer2D = audios.pick_random()
 		audio_player.play()
-		audio_player.pitch_scale = randfn(1.25, 0.02)
+		audio_player.pitch_scale = randfn(1.25 + pitch_mod, 0.02)
+		audio_player.volume_db = -8.5 + vol_mod
